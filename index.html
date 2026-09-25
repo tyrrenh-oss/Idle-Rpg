@@ -16,10 +16,10 @@ h2{font-size:17px;margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.bar{h
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{background:var(--panel2);padding:10px;border-radius:12px}.stat b{display:block;font-size:18px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.btns{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.btn{border:0;border-radius:12px;padding:12px;background:#27334b;color:white;font-weight:750;font-size:14px}.btn.primary{background:var(--accent);color:#09101d}.btn.gold{background:#8b6b1d;color:#fff3c6}.btn:active{transform:scale(.98)}button:disabled{opacity:.45}
 .log{max-height:170px;overflow:auto;font-size:12px;line-height:1.55}.item{padding:6px 0;border-bottom:1px solid #263149}.rarity-common{color:#cbd5e1}.rarity-uncommon{color:#61d095}.rarity-rare{color:#67a5ff}.rarity-epic{color:#c58cff}.rarity-legendary{color:#ffb84d}.rarity-mythic{color:#ff6bcb}
 .equip{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:9px;background:var(--panel2);border-radius:10px;margin:5px 0}.small{font-size:11px;color:var(--muted)}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#0d1320ee;backdrop-filter:blur(12px);border-top:1px solid #263149;padding:9px;display:flex;justify-content:center;gap:8px}.nav button{background:#1b2436;border:0;color:#dbe4f7;border-radius:10px;padding:9px 13px}
+.zone{padding:10px;background:var(--panel2);border-radius:12px;margin-top:8px}.tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#263149;font-size:11px;margin:2px}.locked{opacity:.55}.choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choice .btn{min-height:54px}.tier{font-weight:800}.nav{position:fixed;bottom:0;left:0;right:0;background:#0d1320ee;backdrop-filter:blur(12px);border-top:1px solid #263149;padding:9px;display:flex;justify-content:center;gap:8px}.nav button{background:#1b2436;border:0;color:#dbe4f7;border-radius:10px;padding:9px 13px}
 .modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modalbox{background:var(--panel);border:1px solid #33415e;border-radius:18px;padding:18px;width:min(500px,100%)}
 input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #35425c;background:#0c1220;color:white;margin:6px 0 12px}
-</style>
+.talent-node{position:relative}.talent-tier{grid-column:1/-1;text-align:center;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-top:4px}.</style>
 </head>
 <body>
 <div class="wrap">
@@ -45,6 +45,54 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #35425c
     </div>
   </section>
 
+
+
+  <section class="card">
+    <div class="row"><h2>🗺️ World</h2><span class="muted">Zone <b id="zoneNumber">1</b></span></div>
+    <div class="zone">
+      <div class="row"><b id="zoneName">Greenwood</b><span class="tag" id="zoneRange">Lv 1–5</span></div>
+      <div class="muted" id="zoneDesc">A peaceful forest where new adventurers begin.</div>
+      <div class="small" id="zoneStatus">Progress through quests and defeat enemies to unlock the next zone.</div>
+    </div>
+  </section>
+  <section class="card">
+    <div class="row"><h2>🏰 Dungeons</h2><span class="muted" id="dungeonTier">Normal</span></div>
+    <div class="stat">
+      <div class="row"><b id="dungeonName">Greenwood Cavern</b><span>⚔️ <span id="dungeonReq">Lv 3</span></span></div>
+      <div class="muted" id="dungeonDesc">A short dungeon with stronger enemies and a boss.</div>
+      <div class="row" style="margin-top:8px"><span class="small" id="dungeonReward">Better gear chance</span><button class="btn gold" id="dungeonBtn">Enter Dungeon</button></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row"><h2>🌳 Talent Tree</h2><span class="muted">Talent points: <b id="talentPoints">0</b></span></div>
+    <div class="muted" style="margin-bottom:9px">Spend points to permanently shape your class. Talents are permanent and have no reset timer.</div>
+    <div id="talentTree" class="grid"></div>
+  </section>
+
+  <section class="card">
+    <div class="row"><h2>📜 Quests</h2><span class="muted">Quest <b id="questNumber">1</b></span></div>
+    <div class="stat">
+      <div class="row"><b id="questName">First Blood</b><b>🎁 <span id="questReward">25</span> gold</b></div>
+      <div class="muted" id="questDesc">Defeat 5 monsters.</div>
+      <div class="bar"><div id="questBar" class="fill xp" style="width:0%"></div></div>
+      <div class="row"><span class="small" id="questProgress">0 / 5</span><span class="small" id="questBonus">+10 XP</span></div>
+    </div>
+    <button class="btn gold" id="questClaim" style="width:100%;margin-top:8px" disabled>🔒 Quest in progress</button>
+  </section>
+
+
+  <section class="card">
+    <h2>🧙 Character Build</h2>
+    <div class="muted" style="margin-bottom:8px">Your class shapes your long-term strengths.</div>
+    <div class="choice">
+      <button class="btn" data-build="Warrior">⚔️ Warrior<br><span class="small">HP & Defence</span></button>
+      <button class="btn" data-build="Mage">🔮 Mage<br><span class="small">High Damage</span></button>
+      <button class="btn" data-build="Rogue">🗡️ Rogue<br><span class="small">Critical Hits</span></button>
+      <button class="btn" data-build="Archer">🏹 Archer<br><span class="small">Consistent DPS</span></button>
+    </div>
+  </section>
+
   <section class="card">
     <div class="row"><h2>🎒 Equipment</h2><button class="btn" onclick="openEquip()">Manage</button></div>
     <div id="equipment"></div>
@@ -65,13 +113,189 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #35425c
 const monsters=[
  ["Slime",30,5,10],["Goblin",55,9,18],["Skeleton",90,13,28],["Orc",150,20,45],["Troll",260,29,75],["Demon",450,42,130],["Dragon",800,65,250]
 ];
+const quests=[
+ ["First Blood","Defeat 5 monsters.",5,"kills",25,10],
+ ["Goblin Hunter","Defeat 12 monsters.",12,"kills",75,20],
+ ["Treasure Hunter","Collect 3 pieces of equipment.",3,"loot",150,35],
+ ["Orc Slayer","Reach level 5.",5,"level",300,60],
+ ["Dungeon Veteran","Defeat 35 monsters.",35,"kills",600,100],
+ ["Elite Adventurer","Reach level 10.",10,"level",1200,175],
+ ["Dragon Hunter","Defeat 2 bosses.",2,"boss",2500,300],
+ ["Legendary Hero","Reach level 20.",20,"level",5000,600],
+ ["Mythic Champion","Defeat 100 monsters.",100,"kills",10000,1200]
+];
+
+const zones=[
+ ["Greenwood",1,5,"A peaceful forest where new adventurers begin."],
+ ["Goblin Hills",5,10,"Goblin camps and hidden caves surround the hills."],
+ ["Forgotten Crypts",10,15,"Ancient undead guard forgotten treasure."],
+ ["Orc Wastes",15,25,"A harsh wasteland ruled by powerful orc clans."],
+ ["Frostpeak",25,35,"Frozen peaks filled with elite beasts."],
+ ["Demonlands",35,50,"A dangerous region where demons roam."],
+ ["Dragon Isles",50,70,"The endgame frontier, home to ancient dragons."]
+];
+const dungeons=[
+ ["Greenwood Cavern",3,"A short dungeon with stronger enemies and a boss."],
+ ["Goblin Warren",7,"A deeper dungeon with elite goblins."],
+ ["Crypt of Kings",12,"Undead elites and a powerful crypt boss."],
+ ["Orc Citadel",18,"An orc fortress with rare equipment."],
+ ["Frostkeep",28,"A frozen stronghold with elite guardians."],
+ ["Demon Temple",40,"A dangerous temple packed with high-tier loot."],
+ ["Dragon Sanctum",55,"A legendary endgame dungeon."]
+];
 const rarities=[["Common",1,1],["Uncommon",1.18,2],["Rare",1.4,4],["Epic",1.8,8],["Legendary",2.4,15],["Mythic",3.2,30]];
 let g=JSON.parse(localStorage.getItem("idleRPG")||"null")||{
  name:"Unknown Hero",class:"Warrior",level:1,xp:0,gold:50,hp:100,attack:10,defence:5,crit:5,enemy:0,enemyHp:30,boss:false,paused:false,
- equip:[]
+ equip:[],questIndex:0,questProgress:0,questClaimed:false,
+ talentPoints:0,talents:{},lastTalentLevel:1,zone:0,dungeon:0,dungeonTier:0
 };
 function maxHp(){return 100+(g.level-1)*18}
 function xpNeed(){return Math.floor(100*Math.pow(1.16,g.level-1))}
+
+const talentTrees={
+ Warrior:[
+  ["Iron Skin","Increase Defence by 3.",3,"defence",3,0],["Brutal Force","Increase Attack by 3.",3,"attack",3,0],
+  ["Second Wind","Increase Max HP by 25.",3,"hp",25,1],["Shield Mastery","Increase Defence by 6.",2,"defence",6,1],
+  ["Executioner","Increase Crit by 2%.",3,"crit",2,2],["Warlord","Increase Attack by 8 and Defence by 4.",1,"warlord",1,3]
+ ],
+ Mage:[
+  ["Arcane Power","Increase Attack by 5.",3,"attack",5,0],["Mana Flow","Increase Max HP by 15.",3,"hp",15,0],
+  ["Spell Surge","Increase Crit by 3%.",3,"crit",3,1],["Glass Cannon","Increase Attack by 10.",2,"attack",10,1],
+  ["Arcane Ward","Increase Defence by 3.",2,"defence",3,2],["Archmage","Increase Attack by 15 and Crit by 5%.",1,"archmage",3]
+ ],
+ Rogue:[
+  ["Keen Edge","Increase Attack by 3.",3,"attack",3,0],["Quick Hands","Increase Crit by 3%.",3,"crit",3,0],
+  ["Evasion","Increase Defence by 3.",3,"defence",3,1],["Ambush","Increase Crit by 5%.",2,"crit",5,1],
+  ["Lethality","Increase Attack by 8.",2,"attack",8,2],["Assassin","Increase Attack by 12 and Crit by 7%.",1,"assassin",3]
+ ],
+ Archer:[
+  ["Steady Aim","Increase Attack by 4.",3,"attack",4,0],["Precision","Increase Crit by 2%.",3,"crit",2,0],
+  ["Tactical Retreat","Increase Defence by 4.",3,"defence",4,1],["Deadly Shot","Increase Attack by 9.",2,"attack",9,1],
+  ["Eagle Eye","Increase Crit by 4%.",2,"crit",4,2],["Ranger","Increase Attack by 14 and Crit by 4%.",1,"ranger",3]
+ ]
+};
+function talentUnlocked(i){
+ const tree=talentTrees[g.class]||talentTrees.Warrior, t=tree[i];
+ if(!t)return false;
+ if(t[5]===0)return true;
+ // A node unlocks after at least one point has been spent in its prerequisite node.
+ return (g.talents||{})[t[5]]>0;
+}
+function renderTalents(){
+ const tree=talentTrees[g.class]||talentTrees.Warrior, el=document.getElementById("talentTree");
+ document.getElementById("talentPoints").textContent=g.talentPoints||0;
+ el.innerHTML=tree.map((t,i)=>{
+   const rank=(g.talents||{})[i]||0, max=t[2], full=rank>=max, unlocked=talentUnlocked(i);
+   return `<div class="stat" style="${!unlocked?'opacity:.48':''}">
+    <div class="row"><b>🌿 ${t[0]}</b><span>${rank}/${max}</span></div>
+    <div class="small">${t[1]}</div>
+    <div class="small" style="margin-top:4px">${unlocked?(full?"Fully learned":"Unlocked"):"🔒 Requires previous talent"}</div>
+    <button class="btn ${full||!unlocked?"":"primary"}" style="width:100%;margin-top:8px"
+      data-talent="${i}" ${(!full&&unlocked&&(g.talentPoints||0)>0)?"":"disabled"}>
+      ${full?"✓ Maxed":unlocked?"Spend 1 point":"🔒 Locked"}
+    </button>
+   </div>`;
+ }).join("");
+ el.querySelectorAll("[data-talent]").forEach(btn=>btn.addEventListener("click",()=>spendTalent(+btn.dataset.talent)));
+}
+function spendTalent(i){
+ const tree=talentTrees[g.class]||talentTrees.Warrior, t=tree[i];
+ const rank=(g.talents||{})[i]||0;
+ if(!t || !talentUnlocked(i) || (g.talentPoints||0)<=0 || rank>=t[2])return;
+ g.talents[i]=rank+1; g.talentPoints--;
+ if(t[3]==="attack")g.attack+=t[4];
+ if(t[3]==="defence")g.defence+=t[4];
+ if(t[3]==="crit")g.crit=Math.min(75,g.crit+t[4]);
+ if(t[3]==="hp")g.hp+=t[4];
+ if(t[3]==="warlord"){g.attack+=8;g.defence+=4}
+ if(t[3]==="archmage"){g.attack+=15;g.crit=Math.min(75,g.crit+5)}
+ if(t[3]==="assassin"){g.attack+=12;g.crit=Math.min(75,g.crit+7)}
+ if(t[3]==="ranger"){g.attack+=14;g.crit=Math.min(75,g.crit+4)}
+ log(`🌿 Talent learned: ${t[0]} (${rank+1}/${t[2]}).`);
+ render();save();
+}
+function currentQuest(){return quests[Math.min(g.questIndex||0,quests.length-1)]}
+function questProgressValue(){
+ const q=currentQuest();
+ return q[3]==="level" ? g.level : (g.questProgress||0);
+}
+function updateQuestUI(){
+ const q=currentQuest(), cur=Math.min(questProgressValue(),q[2]);
+ document.getElementById("questNumber").textContent=(g.questIndex||0)+1;
+ document.getElementById("questName").textContent=q[0];
+ document.getElementById("questDesc").textContent=q[1];
+ document.getElementById("questReward").textContent=q[4];
+ document.getElementById("questProgress").textContent=cur+" / "+q[2];
+ document.getElementById("questBar").style.width=Math.min(100,cur/q[2]*100)+"%";
+ document.getElementById("questBonus").textContent="+"+q[5]+" XP";
+ const ready=cur>=q[2] && !g.questClaimed;
+ const btn=document.getElementById("questClaim");
+ btn.disabled=!ready;
+ btn.textContent=ready?"🎁 Claim Quest Reward":(g.questClaimed?"✓ Quest Complete":"🔒 Quest in progress");
+}
+function claimQuest(){
+ const q=currentQuest();
+ if(questProgressValue()<q[2] || g.questClaimed)return;
+ g.gold+=q[4]; g.xp+=q[5]; g.questClaimed=true;
+ log(`📜 Quest complete: ${q[0]}! +${q[4]} gold, +${q[5]} XP.`);
+ if(g.questIndex<quests.length-1){
+   g.questIndex++; g.questProgress=0; g.questClaimed=false;
+   log(`🔓 New quest unlocked: ${quests[g.questIndex][0]}.`);
+ } else log("🏆 You completed the entire quest chain!");
+ while(g.xp>=xpNeed()){
+   g.xp-=xpNeed(); g.level++; g.attack+=2; g.defence+=1;
+   g.crit=Math.min(50,g.crit+0.5); g.hp=maxHp();
+ }
+ render(); save();
+}
+
+
+function updateWorldUI(){
+ const z=zones[Math.min(g.zone||0,zones.length-1)];
+ document.getElementById("zoneNumber").textContent=(g.zone||0)+1;
+ document.getElementById("zoneName").textContent=z[0];
+ document.getElementById("zoneRange").textContent=`Lv ${z[1]}–${z[2]}`;
+ document.getElementById("zoneDesc").textContent=z[3];
+ document.getElementById("zoneStatus").textContent=g.level>=z[2] && g.zone<zones.length-1 ? "Next zone unlocked — continue your adventure." : "Keep questing and growing stronger.";
+ const d=dungeons[Math.min(g.dungeon||0,dungeons.length-1)];
+ document.getElementById("dungeonName").textContent=d[0];
+ document.getElementById("dungeonReq").textContent=`Lv ${d[1]}`;
+ document.getElementById("dungeonDesc").textContent=d[2];
+ document.getElementById("dungeonTier").textContent=["Normal","Heroic","Epic","Legendary"][g.dungeonTier||0];
+ document.getElementById("dungeonReward").textContent=(g.dungeonTier||0)===0?"Better gear chance":(g.dungeonTier===1?"Rare+ gear chance":g.dungeonTier===2?"Epic+ gear chance":"Legendary+ gear chance");
+ document.getElementById("dungeonBtn").disabled=g.level<d[1];
+}
+function maybeUnlockZone(){
+ const next=Math.min((g.zone||0)+1,zones.length-1);
+ if(g.zone<zones.length-1 && g.level>=zones[next][1]){
+   g.zone=next; log(`🗺️ New zone unlocked: ${zones[next][0]}!`);
+   if(g.enemy<monsters.length-1) g.enemy=Math.min(monsters.length-1,g.zone);
+   g.enemyHp=monsters[g.enemy][1];
+ }
+}
+function enterDungeon(){
+ const d=dungeons[Math.min(g.dungeon||0,dungeons.length-1)];
+ if(g.level<d[1])return;
+ const tier=g.dungeonTier||0;
+ const bonus=1+tier*.65;
+ g.gold+=Math.floor(40*bonus);
+ g.xp+=Math.floor(50*bonus);
+ if(Math.random()<.55+tier*.08)loot();
+ if(Math.random()<.18+tier*.04){g.level=Math.max(g.level,g.level);log(`👹 Dungeon boss defeated in ${d[0]}!`);}
+ log(`🏰 Cleared ${d[0]} (${["Normal","Heroic","Epic","Legendary"][tier]}). +${Math.floor(40*bonus)} gold.`);
+ if(g.dungeon<dungeons.length-1 && g.level>=dungeons[g.dungeon+1][1])g.dungeon++;
+ render();save();
+}
+function selectBuild(cls){
+ g.class=cls;
+ if(cls==="Warrior"){g.defence+=3;g.hp=maxHp();}
+ if(cls==="Mage")g.attack+=4;
+ if(cls==="Rogue")g.crit=Math.min(75,g.crit+3);
+ if(cls==="Archer"){g.attack+=2;g.crit=Math.min(75,g.crit+1);}
+ log(`🧙 ${cls} build selected.`);
+ render();save();
+}
+
 function power(){return Math.floor(g.attack*2+g.defence*2+g.level*8+g.crit)}
 function log(s){let el=document.getElementById("log");el.innerHTML="<div class='item'>"+s+"</div>"+el.innerHTML}
 function save(){localStorage.setItem("idleRPG",JSON.stringify(g))}
@@ -82,6 +306,7 @@ function render(){
  document.getElementById("hpText").textContent=Math.max(0,Math.floor(g.hp))+"/"+maxHp();document.getElementById("hpBar").style.width=Math.max(0,g.hp/maxHp()*100)+"%";
  let m=monsters[g.enemy];document.getElementById("enemy").textContent=(g.boss?"👹 BOSS ":"")+m[0];document.getElementById("enemyHp").textContent=Math.max(0,Math.floor(g.enemyHp))+"/"+m[1];document.getElementById("enemyBar").style.width=Math.max(0,g.enemyHp/m[1]*100)+"%";
  document.getElementById("battleState").textContent=g.paused?"OFF":"ON";document.getElementById("toggle").textContent=g.paused?"Resume Battle":"Pause Battle";
+ updateQuestUI(); updateWorldUI();
  document.getElementById("equipment").innerHTML=g.equip.length?g.equip.map((e,i)=>`<div class="equip"><div><b class="rarity-${e.rarity.toLowerCase()}">${e.name}</b><div class="small">${e.slot} • +${e.power} ${e.stat}</div></div><button class="btn" onclick="equipItem(${i})">Equip</button></div>`).join(""):"<div class='muted'>No loot yet. Defeat monsters to find gear.</div>";
 }
 function attackTick(){
@@ -94,12 +319,16 @@ function attackTick(){
  render();save();
 }
 function defeat(m){
+ if(!g.questClaimed && currentQuest()[3]==="kills") g.questProgress=(g.questProgress||0)+1;
+ if(g.boss && !g.questClaimed && currentQuest()[3]==="boss") g.questProgress=(g.questProgress||0)+1;
  let reward=Math.floor(m[3]*(.8+Math.random()*.6));let xp=Math.floor(m[3]*1.2+10);g.gold+=reward;g.xp+=xp;log(`🏆 Defeated ${m[0]}! +${xp} XP, +${reward} gold.`);
  if(Math.random()<0.24)loot();
- while(g.xp>=xpNeed()){g.xp-=xpNeed();g.level++;g.attack+=2;g.defence+=1;g.crit=Math.min(50,g.crit+0.5);g.hp=maxHp();log(`✨ LEVEL UP! You are now level ${g.level}.`);}
+ while(g.xp>=xpNeed()){g.xp-=xpNeed();g.level++;g.attack+=2;g.defence+=1;g.crit=Math.min(50,g.crit+0.5);g.hp=maxHp();g.talentPoints=(g.talentPoints||0)+1;log(`✨ LEVEL UP! You are now level ${g.level}. +1 talent point.`);}
+ maybeUnlockZone();
  g.boss=false;g.enemy=Math.min(monsters.length-1,Math.floor((g.level-1)/2));g.enemyHp=monsters[g.enemy][1];
 }
 function loot(){
+ if(!g.questClaimed && currentQuest()[3]==="loot") g.questProgress=(g.questProgress||0)+1;
  let r=rarities[Math.min(rarities.length-1,Math.floor(Math.random()*100/18))], slots=["Weapon","Armour","Ring","Boots"], stats=["Attack","Defence","Crit"];
  let stat=stats[Math.floor(Math.random()*stats.length)], p=Math.max(1,Math.floor((g.level+2)*r[1]));
  g.equip.unshift({name:r[0]+" "+(stat==="Attack"?"Blade":stat==="Defence"?"Guard":"Charm"),rarity:r[0],slot:slots[Math.floor(Math.random()*slots.length)],stat,power:p});
@@ -116,6 +345,9 @@ function saveCharacter(){g.name=document.getElementById("nameInput").value.trim(
 function openEquip(){document.getElementById("equipment").scrollIntoView({behavior:"smooth"})}
 function manualSave(){save();log("💾 Game saved.")}
 function resetGame(){if(confirm("Reset all progress?")){localStorage.removeItem("idleRPG");location.reload()}}
+document.getElementById("questClaim").onclick=claimQuest;
+document.getElementById("dungeonBtn").onclick=enterDungeon;
+document.querySelectorAll("[data-build]").forEach(b=>b.onclick=()=>selectBuild(b.dataset.build));
 document.getElementById("toggle").onclick=()=>{g.paused=!g.paused;render();save()}
 document.getElementById("boss").onclick=()=>{let m=monsters[Math.min(monsters.length-1,g.enemy+2)];g.enemy=Math.min(monsters.length-1,g.enemy+2);g.enemyHp=m[1]*1.8;g.boss=true;log("⚡ Boss battle started!");render()}
 render();log("⚔️ Your adventure begins.");
