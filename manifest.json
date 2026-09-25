@@ -1,9 +1,0 @@
-{
-  "name":"Idle RPG",
-  "short_name":"Idle RPG",
-  "start_url":"./index.html",
-  "display":"standalone",
-  "background_color":"#0b0f18",
-  "theme_color":"#101522",
-  "icons":[]
-}
