@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101522">
+<link rel="manifest" href="manifest.json">
+<title>Idle RPG</title>
+<style>
+:root{--bg:#0b0f18;--panel:#141b2a;--panel2:#1b2436;--text:#eef3ff;--muted:#98a6c2;--accent:#7c9cff;--gold:#f4c95d;--good:#61d095;--danger:#ff6b7a}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#0b0f18,#10182a);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.wrap{max-width:720px;margin:auto;padding:14px 14px 90px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.title{font-size:24px;font-weight:800}.pill{background:var(--panel);padding:8px 11px;border-radius:999px;color:var(--gold);font-weight:700}
+.card{background:rgba(20,27,42,.96);border:1px solid #263149;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 8px 30px #0003}
+.hero{display:grid;grid-template-columns:82px 1fr;gap:14px;align-items:center}.avatar{width:82px;height:82px;border-radius:20px;display:grid;place-items:center;font-size:44px;background:linear-gradient(135deg,#303d67,#172033);border:1px solid #405078}
+h2{font-size:17px;margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.bar{height:9px;background:#0b101b;border-radius:10px;overflow:hidden;margin:6px 0}.fill{height:100%;background:var(--accent);transition:width .2s}.hp{background:var(--danger)}.xp{background:var(--good)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{background:var(--panel2);padding:10px;border-radius:12px}.stat b{display:block;font-size:18px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.btns{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.btn{border:0;border-radius:12px;padding:12px;background:#27334b;color:white;font-weight:750;font-size:14px}.btn.primary{background:var(--accent);color:#09101d}.btn.gold{background:#8b6b1d;color:#fff3c6}.btn:active{transform:scale(.98)}button:disabled{opacity:.45}
+.log{max-height:170px;overflow:auto;font-size:12px;line-height:1.55}.item{padding:6px 0;border-bottom:1px solid #263149}.rarity-common{color:#cbd5e1}.rarity-uncommon{color:#61d095}.rarity-rare{color:#67a5ff}.rarity-epic{color:#c58cff}.rarity-legendary{color:#ffb84d}.rarity-mythic{color:#ff6bcb}
+.equip{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:9px;background:var(--panel2);border-radius:10px;margin:5px 0}.small{font-size:11px;color:var(--muted)}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#0d1320ee;backdrop-filter:blur(12px);border-top:1px solid #263149;padding:9px;display:flex;justify-content:center;gap:8px}.nav button{background:#1b2436;border:0;color:#dbe4f7;border-radius:10px;padding:9px 13px}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:18px}.modal.open{display:flex}.modalbox{background:var(--panel);border:1px solid #33415e;border-radius:18px;padding:18px;width:min(500px,100%)}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #35425c;background:#0c1220;color:white;margin:6px 0 12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div class="title">⚔️ Idle RPG</div><div class="pill">🪙 <span id="gold">0</span></div></div>
+  <section class="card hero">
+    <div class="avatar" id="avatar">⚔️</div>
+    <div><div class="row"><div><h2 id="name">Unknown Hero</h2><div class="muted"><span id="className">Warrior</span> • Level <span id="level">1</span></div></div><b>🏆 <span id="power">0</span></b></div>
+      <div class="muted">XP <span id="xpText">0/100</span></div><div class="bar"><div id="xpBar" class="fill xp" style="width:0%"></div></div>
+      <div class="muted">HP <span id="hpText">100/100</span></div><div class="bar"><div id="hpBar" class="fill hp" style="width:100%"></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row"><h2>⚔️ Adventure</h2><span class="muted">Auto battle: <b id="battleState">ON</b></span></div>
+    <div class="stat"><div class="row"><b id="enemy">Slime</b><b id="enemyHp">30/30</b></div><div class="bar"><div id="enemyBar" class="fill hp" style="width:100%"></div></div><div class="small">Your hero attacks automatically every second.</div></div>
+    <div class="btns" style="margin-top:9px"><button class="btn primary" id="toggle">Pause Battle</button><button class="btn gold" id="boss">⚡ Fight Boss</button></div>
+  </section>
+
+  <section class="card">
+    <h2>📊 Stats</h2><div class="grid">
+      <div class="stat">⚔️ Attack <b id="attack">10</b></div><div class="stat">🛡️ Defence <b id="defence">5</b></div>
+      <div class="stat">💥 Crit <b id="crit">5%</b></div><div class="stat">❤️ Max HP <b id="maxhp">100</b></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row"><h2>🎒 Equipment</h2><button class="btn" onclick="openEquip()">Manage</button></div>
+    <div id="equipment"></div>
+  </section>
+
+  <section class="card"><h2>📜 Battle Log</h2><div class="log" id="log"></div></section>
+</div>
+
+<div class="modal" id="modal"><div class="modalbox">
+<h2>⚙️ Character</h2><label class="muted">Name</label><input id="nameInput" maxlength="18">
+<label class="muted">Class</label><select id="classInput"><option>Warrior</option><option>Mage</option><option>Rogue</option><option>Archer</option></select>
+<button class="btn primary" style="width:100%" onclick="saveCharacter()">Save</button>
+</div></div>
+
+<div class="nav"><button onclick="openCharacter()">👤 Character</button><button onclick="rest()">💚 Rest</button><button onclick="manualSave()">💾 Save</button><button onclick="resetGame()">♻️ Reset</button></div>
+
+<script>
+const monsters=[
+ ["Slime",30,5,10],["Goblin",55,9,18],["Skeleton",90,13,28],["Orc",150,20,45],["Troll",260,29,75],["Demon",450,42,130],["Dragon",800,65,250]
+];
+const rarities=[["Common",1,1],["Uncommon",1.18,2],["Rare",1.4,4],["Epic",1.8,8],["Legendary",2.4,15],["Mythic",3.2,30]];
+let g=JSON.parse(localStorage.getItem("idleRPG")||"null")||{
+ name:"Unknown Hero",class:"Warrior",level:1,xp:0,gold:50,hp:100,attack:10,defence:5,crit:5,enemy:0,enemyHp:30,boss:false,paused:false,
+ equip:[]
+};
+function maxHp(){return 100+(g.level-1)*18}
+function xpNeed(){return Math.floor(100*Math.pow(1.16,g.level-1))}
+function power(){return Math.floor(g.attack*2+g.defence*2+g.level*8+g.crit)}
+function log(s){let el=document.getElementById("log");el.innerHTML="<div class='item'>"+s+"</div>"+el.innerHTML}
+function save(){localStorage.setItem("idleRPG",JSON.stringify(g))}
+function render(){
+ document.getElementById("name").textContent=g.name;document.getElementById("className").textContent=g.class;document.getElementById("level").textContent=g.level;
+ document.getElementById("gold").textContent=Math.floor(g.gold);document.getElementById("power").textContent=power();document.getElementById("attack").textContent=g.attack;document.getElementById("defence").textContent=g.defence;document.getElementById("crit").textContent=g.crit+"%";document.getElementById("maxhp").textContent=maxHp();
+ document.getElementById("xpText").textContent=g.xp+"/"+xpNeed();document.getElementById("xpBar").style.width=Math.min(100,g.xp/xpNeed()*100)+"%";
+ document.getElementById("hpText").textContent=Math.max(0,Math.floor(g.hp))+"/"+maxHp();document.getElementById("hpBar").style.width=Math.max(0,g.hp/maxHp()*100)+"%";
+ let m=monsters[g.enemy];document.getElementById("enemy").textContent=(g.boss?"👹 BOSS ":"")+m[0];document.getElementById("enemyHp").textContent=Math.max(0,Math.floor(g.enemyHp))+"/"+m[1];document.getElementById("enemyBar").style.width=Math.max(0,g.enemyHp/m[1]*100)+"%";
+ document.getElementById("battleState").textContent=g.paused?"OFF":"ON";document.getElementById("toggle").textContent=g.paused?"Resume Battle":"Pause Battle";
+ document.getElementById("equipment").innerHTML=g.equip.length?g.equip.map((e,i)=>`<div class="equip"><div><b class="rarity-${e.rarity.toLowerCase()}">${e.name}</b><div class="small">${e.slot} • +${e.power} ${e.stat}</div></div><button class="btn" onclick="equipItem(${i})">Equip</button></div>`).join(""):"<div class='muted'>No loot yet. Defeat monsters to find gear.</div>";
+}
+function attackTick(){
+ if(g.paused)return;
+ let m=monsters[g.enemy], dmg=Math.max(1,g.attack-Math.floor(Math.random()*Math.max(1,m[2]/2)));
+ if(Math.random()*100<g.crit)dmg*=2;
+ g.enemyHp-=dmg;
+ if(Math.random()<0.22){g.hp-=Math.max(1,m[2]-g.defence); if(g.hp<=0){g.hp=maxHp();g.gold=Math.max(0,g.gold-5);log("💀 You were defeated. Lost 5 gold and recovered.");}}
+ if(g.enemyHp<=0) defeat(m);
+ render();save();
+}
+function defeat(m){
+ let reward=Math.floor(m[3]*(.8+Math.random()*.6));let xp=Math.floor(m[3]*1.2+10);g.gold+=reward;g.xp+=xp;log(`🏆 Defeated ${m[0]}! +${xp} XP, +${reward} gold.`);
+ if(Math.random()<0.24)loot();
+ while(g.xp>=xpNeed()){g.xp-=xpNeed();g.level++;g.attack+=2;g.defence+=1;g.crit=Math.min(50,g.crit+0.5);g.hp=maxHp();log(`✨ LEVEL UP! You are now level ${g.level}.`);}
+ g.boss=false;g.enemy=Math.min(monsters.length-1,Math.floor((g.level-1)/2));g.enemyHp=monsters[g.enemy][1];
+}
+function loot(){
+ let r=rarities[Math.min(rarities.length-1,Math.floor(Math.random()*100/18))], slots=["Weapon","Armour","Ring","Boots"], stats=["Attack","Defence","Crit"];
+ let stat=stats[Math.floor(Math.random()*stats.length)], p=Math.max(1,Math.floor((g.level+2)*r[1]));
+ g.equip.unshift({name:r[0]+" "+(stat==="Attack"?"Blade":stat==="Defence"?"Guard":"Charm"),rarity:r[0],slot:slots[Math.floor(Math.random()*slots.length)],stat,power:p});
+ g.equip=g.equip.slice(0,8);log(`🎁 ${r[0]} loot found!`);
+}
+function equipItem(i){
+ let e=g.equip[i];if(!e)return;
+ if(e.stat==="Attack")g.attack+=e.power;if(e.stat==="Defence")g.defence+=e.power;if(e.stat==="Crit")g.crit=Math.min(75,g.crit+e.power/3);
+ g.equip.splice(i,1);log(`🛡️ Equipped ${e.name}.`);render();save();
+}
+function rest(){g.hp=maxHp();log("💚 Fully rested.");render();save()}
+function openCharacter(){document.getElementById("nameInput").value=g.name;document.getElementById("classInput").value=g.class;document.getElementById("modal").classList.add("open")}
+function saveCharacter(){g.name=document.getElementById("nameInput").value.trim()||"Unknown Hero";g.class=document.getElementById("classInput").value;document.getElementById("modal").classList.remove("open");log("👤 Character updated.");render();save()}
+function openEquip(){document.getElementById("equipment").scrollIntoView({behavior:"smooth"})}
+function manualSave(){save();log("💾 Game saved.")}
+function resetGame(){if(confirm("Reset all progress?")){localStorage.removeItem("idleRPG");location.reload()}}
+document.getElementById("toggle").onclick=()=>{g.paused=!g.paused;render();save()}
+document.getElementById("boss").onclick=()=>{let m=monsters[Math.min(monsters.length-1,g.enemy+2)];g.enemy=Math.min(monsters.length-1,g.enemy+2);g.enemyHp=m[1]*1.8;g.boss=true;log("⚡ Boss battle started!");render()}
+render();log("⚔️ Your adventure begins.");
+setInterval(attackTick,1000);
+
+document.addEventListener("visibilitychange",()=>{
+ if(document.hidden)save();
+});
+window.addEventListener("beforeunload",save);
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}</script></body></html>
